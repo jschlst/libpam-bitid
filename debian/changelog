@@ -1,0 +1,5 @@
+libpam-bitid (0.0.1); urgency=low
+
+  * New upstream release.
+
+ -- Jay Schulist <jayschulist@gmail.com>  Fri May  9 23:07:08 PDT 2014

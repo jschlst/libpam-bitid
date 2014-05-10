@@ -1,0 +1,17 @@
+Source: libpam-bitid
+Section: misc
+Priority: extra
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Build-Depends: debhelper (>= 9),
+               dh-autoreconf,
+               libpam0g-dev,
+               pkg-config,
+Standards-Version: 3.9.4
+Homepage: https://github.com/jollycoder/libpam-bitid.git
+Vcs-Git: https://github.com/jollycoder/libpam-bitid.git
+
+Package: libpam-bitid
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: A PAM module to use a bitcoin address for credentials.
