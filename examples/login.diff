@@ -1,11 +1,11 @@
 --- /etc/pam.d/login.orig	2014-05-09 21:42:55.000000000 -0700
-+++ /etc/pam.d/login	2014-05-09 21:41:48.000000000 -0700
++++ /etc/pam.d/login	2014-05-09 23:29:02.000000000 -0700
 @@ -2,6 +2,9 @@
  # The PAM configuration file for the Shadow `login' service
  #
  
 +# Allow bitcoin address as a login authentication method.
-+auth       optional pam_bitcoin.so file=/etc/bitcoin.access
++auth       optional pam_bitid.so file=/etc/bitcoin.access
 +
  # Enforce a minimal delay in case of failure (in microseconds).
  # (Replaces the `FAIL_DELAY' setting from login.defs)
@@ -15,7 +15,7 @@
  
  # Standard Un*x authentication.
 -@include common-auth
-+#@include common-auth
++# @include common-auth
  
  # This allows certain extra groups to be granted to a user
  # based on things like time of day, tty, service, and user.

@@ -118,17 +118,16 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(pamlibdir)"
 LTLIBRARIES = $(pamlib_LTLIBRARIES)
-pam_bitcoin_la_LIBADD =
-am_pam_bitcoin_la_OBJECTS = pam_bitcoin_la-pam_bitcoin.lo
-pam_bitcoin_la_OBJECTS = $(am_pam_bitcoin_la_OBJECTS)
+pam_bitid_la_LIBADD =
+am_pam_bitid_la_OBJECTS = pam_bitid_la-pam_bitid.lo
+pam_bitid_la_OBJECTS = $(am_pam_bitid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-pam_bitcoin_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(pam_bitcoin_la_CFLAGS) $(CFLAGS) $(pam_bitcoin_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
+pam_bitid_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(pam_bitid_la_CFLAGS) \
+	$(CFLAGS) $(pam_bitid_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -163,8 +162,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(pam_bitcoin_la_SOURCES)
-DIST_SOURCES = $(pam_bitcoin_la_SOURCES)
+SOURCES = $(pam_bitid_la_SOURCES)
+DIST_SOURCES = $(pam_bitid_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -311,10 +310,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pamlibdir = $(PAMMODULEDIR)
-pamlib_LTLIBRARIES = pam_bitcoin.la
-pam_bitcoin_la_SOURCES = pam_bitcoin.c
-pam_bitcoin_la_LDFLAGS = -no-undefined -avoid-version -module
-pam_bitcoin_la_CFLAGS = -Wall -I../include
+pamlib_LTLIBRARIES = pam_bitid.la
+pam_bitid_la_SOURCES = pam_bitid.c
+pam_bitid_la_LDFLAGS = -no-undefined -avoid-version -module
+pam_bitid_la_CFLAGS = -Wall -I../include
 all: all-am
 
 .SUFFIXES:
@@ -385,8 +384,8 @@ clean-pamlibLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-pam_bitcoin.la: $(pam_bitcoin_la_OBJECTS) $(pam_bitcoin_la_DEPENDENCIES) $(EXTRA_pam_bitcoin_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(pam_bitcoin_la_LINK) -rpath $(pamlibdir) $(pam_bitcoin_la_OBJECTS) $(pam_bitcoin_la_LIBADD) $(LIBS)
+pam_bitid.la: $(pam_bitid_la_OBJECTS) $(pam_bitid_la_DEPENDENCIES) $(EXTRA_pam_bitid_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(pam_bitid_la_LINK) -rpath $(pamlibdir) $(pam_bitid_la_OBJECTS) $(pam_bitid_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -394,7 +393,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam_bitcoin_la-pam_bitcoin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pam_bitid_la-pam_bitid.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -417,12 +416,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-pam_bitcoin_la-pam_bitcoin.lo: pam_bitcoin.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_bitcoin_la_CFLAGS) $(CFLAGS) -MT pam_bitcoin_la-pam_bitcoin.lo -MD -MP -MF $(DEPDIR)/pam_bitcoin_la-pam_bitcoin.Tpo -c -o pam_bitcoin_la-pam_bitcoin.lo `test -f 'pam_bitcoin.c' || echo '$(srcdir)/'`pam_bitcoin.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/pam_bitcoin_la-pam_bitcoin.Tpo $(DEPDIR)/pam_bitcoin_la-pam_bitcoin.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pam_bitcoin.c' object='pam_bitcoin_la-pam_bitcoin.lo' libtool=yes @AMDEPBACKSLASH@
+pam_bitid_la-pam_bitid.lo: pam_bitid.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_bitid_la_CFLAGS) $(CFLAGS) -MT pam_bitid_la-pam_bitid.lo -MD -MP -MF $(DEPDIR)/pam_bitid_la-pam_bitid.Tpo -c -o pam_bitid_la-pam_bitid.lo `test -f 'pam_bitid.c' || echo '$(srcdir)/'`pam_bitid.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/pam_bitid_la-pam_bitid.Tpo $(DEPDIR)/pam_bitid_la-pam_bitid.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pam_bitid.c' object='pam_bitid_la-pam_bitid.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_bitcoin_la_CFLAGS) $(CFLAGS) -c -o pam_bitcoin_la-pam_bitcoin.lo `test -f 'pam_bitcoin.c' || echo '$(srcdir)/'`pam_bitcoin.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pam_bitid_la_CFLAGS) $(CFLAGS) -c -o pam_bitid_la-pam_bitid.lo `test -f 'pam_bitid.c' || echo '$(srcdir)/'`pam_bitid.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
