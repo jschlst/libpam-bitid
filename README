@@ -1,0 +1,30 @@
+A PAM module to use a bitcoin address for credentials
+
+Note: this is a work in progress leading up to release 1.0.0
+
+Build
+=====
+./autogen.sh
+./configure --prefix=/usr
+make
+make install
+
+Install
+=======
+
+1. Build and install this package, libpam-bitcoin.
+2. Edit /etc/pam.d/login and add the lines from examples/login.diff
+3. cp examples/bitcoin.access /etc/
+4. Edit /etc/bitcoin.access and include list of allowed addresses/user pairs
+
+Example
+=======
+
+$ telnet localhost
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+Ubuntu 13.10
+bitcoin: 1LdT92GDvP96cuiDRnQPhG4yCigQfxzWpz
+message: test
+signature: HL/GMhEijPCs1ZW4n7cekKKLSHcioteMQU4yeS/VDy0xmErtExnWr83vg7q32ARCIJGF1DMQZfl/L4dYm2Z7MuU=
