@@ -1,9 +1,9 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: libpam-freerdp
-Source: http://launchpad.net/libpam-freerdp
+Upstream-Name: libpam-bitid
+Source: https://github.com/jollycoder/libpam-bitid.git
 
 Files: *
-Copyright: 2012, Canonical Ltd.
+Copyright: 2014, Jay Schulist
 License: GPL-3
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,4 +19,3 @@ License: GPL-3
  .
  On Debian systems, the complete text of the GNU General
  Public License version 3 can be found in "/usr/share/common-licenses/GPL-3".
-

@@ -17,7 +17,7 @@ Note: this is a work in progress leading up to release 1.0.0
 1. Build and install this package.
 2. Edit /etc/pam.d/login and add the lines from examples/login.diff
 3. cp examples/bitcoin.access /etc/bitcoin.access
-4. Edit /etc/bitcoin.access and include list of allowed addresses/username pairs
+4. Edit /etc/bitcoin.access and include list of allowed address/username pairs
 
 # Example
 ```
