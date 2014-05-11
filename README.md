@@ -5,21 +5,21 @@ A PAM module to use a bitcoin address for credentials
 
 Note: this is a work in progress leading up to release 1.0.0
 
-# Build
+## Build
 
 1. ./autogen.sh
 2. ./configure --prefix=/usr
 3. make
 4. sudo make install
 
-# Install
+## Install
 
 1. Build and install this package.
 2. Edit /etc/pam.d/login and add the lines from examples/login.diff
 3. cp examples/bitcoin.access /etc/bitcoin.access
 4. Edit /etc/bitcoin.access and include list of allowed address/username pairs
 
-# Example
+## Example
 ```
 $ telnet localhost
 Trying 127.0.0.1...
@@ -34,3 +34,7 @@ Welcome to Ubuntu 13.10 (GNU/Linux 3.11.0-12-generic x86_64)
  
 btctest:~$
 ```
+
+## Documentation
+* BitID protocol specification (https://github.com/bitid/bitid)
+* Linux-PAM (http://www.linux-pam.org)
