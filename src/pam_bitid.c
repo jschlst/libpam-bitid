@@ -105,40 +105,84 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
   return msg;
 }
 
-/* changing authentication token, could be used to update what bitcoin address
- * allowed to login from?
- */
+/* base58 so we don't want 0OIl characters. */
+static int
+base58_check(char *data, int len)
+{
+  const char base58[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	int base58_len = strlen(base58);
+	int i, j;
+
+  for (i=0; i < len; i++) {
+    for (j=0; j < base58_len; j++) {	// check all base58 for a match
+      if (data[i] == base58[j])
+          break;
+    }
+    if (j == base58_len)  // no match found 
+			return -EINVAL;			// bad character in data
+  }
+	return 0;
+}
+
+/* simple checks to validate address. */
+static int
+validate_address(char *addr)
+{
+	unsigned char first_byte = addr[0];
+	int len;
+
+	/* bitcoin first btye is either 1 or 3. */
+	if (first_byte != '1' && first_byte != '3')
+		return -1;
+
+	len = strlen(addr);
+	if (len < 27 || len > 34)
+		return -2;
+
+	if (base58_check(addr, len) < 0)
+		return -3;
+
+	return 0;
+}
 
 static int
-pam_bitcoin (pam_handle_t *pamh, int flags, int argc, const char **argv)
+verify_address(pam_handle_t *pamh, char *file, char *addr, char *username)
 {
-  char msg[PAM_MAX_MSG_SIZE];
-  int orig_argc = argc;
-  const char **orig_argv = argv;
-  const char *file = NULL;
-  char *message = NULL;
-  char *addr = NULL;
-  char *sig = NULL;
-  char username[PAM_MAX_MSG_SIZE];
-  int fd, retval;
-
-  /* use filename for bitcoin username lookup. */
-  for (; argc-- > 0; ++argv) {
-      if (!strncmp (*argv, "file=", 5))
-	file = (5 + *argv);
-  }
-
-  /* No file= option, must have it.  */
-  if (file == NULL || file[0] == '\0') {
-    pam_syslog(pamh, LOG_ERR, "Bitcoin login allowed users configuration file not provided");
-    retval = PAM_IGNORE;
-    return retval;
-  }
+	int fd;
 
   /* If no configuration then ignore, so defaults work. */
   fd = open(file, O_RDONLY);
   if (fd < 0) {
     pam_syslog(pamh, LOG_ERR, "Unable to open configuration file: %s", file);
+		return -1;
+  }
+  strcpy(username, "btctest");
+  close(fd);
+	return 0;
+}
+
+static int
+pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
+{
+  char msg[PAM_MAX_MSG_SIZE];
+  int orig_argc = argc;
+  const char **orig_argv = argv;
+  char *file = NULL;
+  char *message = NULL;
+  char *addr = NULL;
+  char *sig = NULL;
+  char username[PAM_MAX_MSG_SIZE];
+  int retval;
+
+  /* use filename for bitcoin username lookup. */
+  for (; argc-- > 0; ++argv) {
+      if (!strncmp (*argv, "file=", 5))
+				file = (5 + *argv);
+  }
+
+  /* No file= option, must have it.  */
+  if (file == NULL || file[0] == '\0') {
+    pam_syslog(pamh, LOG_ERR, "Bitcoin login access configuration file not provided");
     retval = PAM_IGNORE;
     return retval;
   }
@@ -150,13 +194,24 @@ pam_bitcoin (pam_handle_t *pamh, int flags, int argc, const char **argv)
   }
   // printf("will use address: %s\n", addr);
 
-  /* validate address format? Who cares if it has to be in a file... */
+  /* validate address format provided from the user. */
+	retval = validate_address(addr);
+	if (retval < 0) {
+		pam_syslog(pamh, LOG_ERR, "malformed bitcoin address used for login %d", retval);
+		retval = PAM_AUTH_ERR;
+		return retval;
+	}
 
   /* lookup address to see if user can login using bitcoin. */
-  strcpy(username, "btctest");
-  close(fd);
+	retval = verify_address(pamh, file, addr, username);
+	if (retval < 0 || username == NULL) {
+		pam_syslog(pamh, LOG_ERR, "bitcoin address is not authorized for access: %s", addr);
+    retval = PAM_AUTH_ERR;
+    return retval;
+  }
 
-  /* option for bitid challenge generation.
+  /* option for user entered challenge
+	 * option for bitid challenge generation.
    *
    * bitid://hostname/callback?x=Nonce&u=1 
    *
@@ -233,6 +288,9 @@ pam_sm_close_session (pam_handle_t *pamh, int flags,
   return PAM_IGNORE;
 }
 
+/* changing authentication token, could be used to update bitcoin address
+ * user is allowed to login from.
+ */
 int
 pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc,
 		  const char **argv)
