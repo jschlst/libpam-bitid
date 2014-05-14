@@ -18,6 +18,7 @@
 #include "config.h"
 #endif
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -32,6 +33,8 @@
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
 #endif
+
+#define BTC_LEN_MAX	255
 
 #define PAM_SM_ACCOUNT
 #define PAM_SM_AUTH
@@ -67,7 +70,7 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
       break;
 
     case BTC_MSG2SIGN:
-      message.msg = "message: ";
+      message.msg = "challenge message: ";
       break;
 
     case BTC_SIG:
@@ -93,6 +96,7 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
     return NULL;
   }
 
+	/* Note: must free message when done. */
   msg = malloc(PAM_MAX_MSG_SIZE);
   memset(msg, '\0', PAM_MAX_MSG_SIZE);
   len = strlen(promptval);
@@ -109,18 +113,18 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
 static int
 base58_check(char *data, int len)
 {
-  const char base58[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+	const char base58[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 	int base58_len = strlen(base58);
 	int i, j;
 
-  for (i=0; i < len; i++) {
-    for (j=0; j < base58_len; j++) {	// check all base58 for a match
-      if (data[i] == base58[j])
-          break;
-    }
-    if (j == base58_len)  // no match found 
+  	for (i=0; i < len; i++) {
+		for (j=0; j < base58_len; j++) {	// check all base58 for a match
+			if (data[i] == base58[j])
+          			break;
+    		}
+    		if (j == base58_len)  // no match found
 			return -EINVAL;			// bad character in data
-  }
+	}
 	return 0;
 }
 
@@ -128,11 +132,10 @@ base58_check(char *data, int len)
 static int
 validate_address(char *addr)
 {
-	unsigned char first_byte = addr[0];
 	int len;
 
 	/* bitcoin first btye is either 1 or 3. */
-	if (first_byte != '1' && first_byte != '3')
+	if (addr[0] != '1' && addr[0] != '3')
 		return -1;
 
 	len = strlen(addr);
@@ -145,112 +148,148 @@ validate_address(char *addr)
 	return 0;
 }
 
-static int
-verify_address(pam_handle_t *pamh, char *file, char *addr, char *username)
+static char *
+remove_whitespace(char *str)
 {
-	int fd;
+	char *i, *result;
+        int temp = 0;
 
-  /* If no configuration then ignore, so defaults work. */
-  fd = open(file, O_RDONLY);
-  if (fd < 0) {
-    pam_syslog(pamh, LOG_ERR, "Unable to open configuration file: %s", file);
-		return -1;
-  }
-  strcpy(username, "btctest");
-  close(fd);
-	return 0;
+	if (str == NULL)
+		return NULL;
+
+	result = malloc(strlen(str)+1);
+	memset(result, 0, strlen(str)+1);
+        for (i = str; *i; ++i) {
+		if (!isspace(*i)) {
+                	result[temp] = (*i);
+                	++temp;
+            	}
+	}
+        result[temp] = '\0';
+        return result;
+}
+
+static char * 
+verify_address(pam_handle_t *pamh, char *file, char *addr)
+{
+	char *address, *username = NULL;
+	char data[1000];
+	FILE *fd;
+	char delims[] = ",";
+
+	/* If no configuration then ignore, so defaults work. */
+	fd = fopen(file, "r");
+	if (fd < 0) {
+		pam_syslog(pamh, LOG_ERR, "Unable to open configuration file: %s", file);
+		return NULL;
+  	}
+
+	/* comments start with '#'
+	 * one per line, format: bitcoin-address, username 
+	 */
+	while (fgets(data, 1000, fd) != NULL) {
+		/* remove comments. */
+		if (data[0] == '#')
+			continue;
+		/* remove any whitespace */
+		address = remove_whitespace(strtok(data, delims));
+		if (address == NULL)
+			continue;
+		username = remove_whitespace(strtok(NULL, delims));
+                if (username == NULL)
+                        continue;
+		if (!strcmp(addr, address)) {
+			break;
+		}
+	}
+  	fclose(fd);
+	return username;
 }
 
 static int
 pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
-  char msg[PAM_MAX_MSG_SIZE];
-  int orig_argc = argc;
-  const char **orig_argv = argv;
-  char *file = NULL;
-  char *message = NULL;
-  char *addr = NULL;
-  char *sig = NULL;
-  char username[PAM_MAX_MSG_SIZE];
-  int retval;
+	char *file = NULL;
+  	char *message = NULL;
+  	char *addr = NULL;
+  	char *sig = NULL;
+  	char *username = NULL;
+  	int retval;
 
-  /* use filename for bitcoin username lookup. */
-  for (; argc-- > 0; ++argv) {
-      if (!strncmp (*argv, "file=", 5))
-				file = (5 + *argv);
-  }
+  	/* use filename for bitcoin username lookup. */
+  	for (; argc-- > 0; ++argv) {
+      		if (!strncmp (*argv, "file=", 5))
+			file = (5 + *argv);
+  	}
 
-  /* No file= option, must have it.  */
-  if (file == NULL || file[0] == '\0') {
-    pam_syslog(pamh, LOG_ERR, "Bitcoin login access configuration file not provided");
-    retval = PAM_IGNORE;
-    return retval;
-  }
+  	/* No file= option, must have it.  */
+  	if (file == NULL || file[0] == '\0') {
+    		pam_syslog(pamh, LOG_ERR, "Bitcoin login access configuration file not provided");
+    		retval = PAM_IGNORE;
+		goto end;
+  	}
 
-  /* get bitcoin address. */
-  if ((addr = get_bitcoin_info(pamh, BTC_ADDR)) == NULL) {
-    retval = PAM_AUTH_ERR;
-    return retval;
-  }
-  // printf("will use address: %s\n", addr);
+  	/* get bitcoin address. */
+  	if ((addr = get_bitcoin_info(pamh, BTC_ADDR)) == NULL) {
+    		retval = PAM_AUTH_ERR;
+		goto end;
+  	}
 
-  /* validate address format provided from the user. */
+  	/* validate address format provided from the user. */
 	retval = validate_address(addr);
 	if (retval < 0) {
 		pam_syslog(pamh, LOG_ERR, "malformed bitcoin address used for login %d", retval);
-		retval = PAM_AUTH_ERR;
-		return retval;
+		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
+		goto end;
 	}
 
-  /* lookup address to see if user can login using bitcoin. */
-	retval = verify_address(pamh, file, addr, username);
-	if (retval < 0 || username == NULL) {
+	/* lookup address to see if user can login using bitcoin. */
+	username = verify_address(pamh, file, addr);
+	if (username == NULL) {
 		pam_syslog(pamh, LOG_ERR, "bitcoin address is not authorized for access: %s", addr);
-    retval = PAM_AUTH_ERR;
-    return retval;
-  }
+		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
+		goto end;
+	}
+	/* set username details associated with this address. */
+  	retval = pam_set_item(pamh, PAM_USER, username);
+  	if (retval != PAM_SUCCESS)
+		goto end;
+	pam_syslog(pamh, LOG_INFO, "authorized (%s) from address: %s\n", username, addr);
 
-  /* option for user entered challenge
+	/* option for user entered challenge
 	 * option for bitid challenge generation.
-   *
-   * bitid://hostname/callback?x=Nonce&u=1 
-   *
-   * show QR code to sign with mobile device
-   */
+	 *
+   	 * bitid://hostname/callback?x=Nonce&u=1 
+   	 *
+   	 * show QR code to sign with mobile device
+   	 */
 
-  /* get message to sign. */
+  /* generate or get message to sign. */
   if ((message = get_bitcoin_info(pamh, BTC_MSG2SIGN)) == NULL) {
     retval = PAM_AUTH_ERR;
     return retval;
   }
-  // printf("will sign message: %s\n", message);
 
   /* get signature of message. */
   if ((sig = get_bitcoin_info(pamh, BTC_SIG)) == NULL) {
     retval = PAM_AUTH_ERR;
     return retval;
   }
-  // printf("will use signature: %s\n", sig);
 
   /* use signature to authenticate address. */
  
-  /* get username details associated with this address. */
-  retval = pam_set_item(pamh, PAM_USER, username);
-  if (retval != PAM_SUCCESS) {
-    printf("set pam_user failed\n");
-    return PAM_USER_UNKNOWN;
-  }
-
   /* do bitid callback for pam... */
 
-  pam_syslog(pamh, LOG_INFO, "bitcoin authentication successful: %s (%s)", addr, username);
-
-  free(addr);
-  free(message);
-  free(sig);
-
-  retval = PAM_SUCCESS;
-  return retval;
+  	pam_syslog(pamh, LOG_INFO, "bitcoin authentication successful: %s (%s)", addr, username);
+  	retval = PAM_SUCCESS;
+end:
+	if (addr)
+		free(addr);
+	if (message)
+		free(message);
+	if (sig)
+  		free(sig);
+	return retval;
 }
 
 int
