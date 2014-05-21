@@ -7,17 +7,20 @@
 uint8_t charTable[64] = 
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-size_t b64_encodedLength(size_t length)
+size_t 
+b64_encodedLength(size_t length)
 {
 	return (length + 2) / 3 * 4;
 }
 
-size_t b64_decodedLength(size_t length)
+size_t 
+b64_decodedLength(size_t length)
 {
 	return length * 3 / 4;
 }
 
-void b64_encode(uint8_t *src, size_t len, uint8_t *dst)
+void 
+b64_encode(uint8_t *src, size_t len, uint8_t *dst)
 {
 	while(len >= 3) {
 		// 1st b64 char
@@ -74,10 +77,10 @@ void b64_encode(uint8_t *src, size_t len, uint8_t *dst)
 	}
 }
 
-uint8_t lookupB64(uint8_t c)
+uint8_t 
+lookupB64(uint8_t c)
 {
-	switch(c)
-	{
+	switch(c) {
 		default:
 		case 'A': return 0;
 		case 'B': return 1;
@@ -146,13 +149,15 @@ uint8_t lookupB64(uint8_t c)
 	}
 }
 
-void decode2(uint8_t *src, uint8_t *dst)
+void 
+decode2(uint8_t *src, uint8_t *dst)
 {
 	*dst = lookupB64(src[0]) << 2;
 	*dst |= (lookupB64(src[1]) & 0x30) >> 4;
 }
 
-void decode3(uint8_t *src, uint8_t *dst)
+void 
+decode3(uint8_t *src, uint8_t *dst)
 {
 	decode2(src, dst);
 	dst++;
@@ -161,7 +166,8 @@ void decode3(uint8_t *src, uint8_t *dst)
 	*dst |= (lookupB64(src[2]) & 0x3c) >> 2;
 }
 
-void decode4(uint8_t *src, uint8_t *dst)
+void 
+decode4(uint8_t *src, uint8_t *dst)
 {
 	decode3(src, dst);
 	dst += 2;
@@ -170,12 +176,12 @@ void decode4(uint8_t *src, uint8_t *dst)
 	*dst |= lookupB64(src[3]);
 }
 
-size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst)
+size_t 
+b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 {
 	size_t dstLength = 0;
 
-	while(len >= 5)
-	{
+	while(len >= 5) {
 		decode4(src, dst);
 		dst += 3;
 		src += 4;
@@ -183,20 +189,14 @@ size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 		dstLength += 3;
 	}
 	
-	if(len == 4)
-	{
-		if(src[3] != '=')
-		{
+	if(len == 4) {
+		if(src[3] != '=') {
 			decode4(src, dst);
 			dstLength += 3;
-		} 
-		else if(src[2] != '=')
-		{
+		} else if(src[2] != '=') {
 			decode3(src, dst);
 			dstLength += 2;
-		}
-		else
-		{
+		} else {
 			decode2(src, dst);
 			dstLength += 1;
 		}
@@ -205,18 +205,13 @@ size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 	// The following code handles non standard code that doesnt use the '='
 	// termination symbol 
 
-	else if(len == 3)
-	{
+	else if(len == 3) {
 		decode3(src, dst);
 		dstLength += 2;
-	}
-	else if(len == 2)
-	{
+	} else if(len == 2) {
 		decode2(src, dst);
 		dstLength += 1;
-	}
-	else
-	{
+	} else {
 		// encoding error!
 	}
 
@@ -231,7 +226,8 @@ size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 static const char *ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 static unsigned char INDEXES[128] = { -1 };
 
-unsigned char * getIndexes(){
+unsigned char *
+getIndexes(){
 	int i;
 
 	for (i = 0; i < 58; i++)
@@ -240,9 +236,11 @@ unsigned char * getIndexes(){
 	return INDEXES;
 }
 
-unsigned char divmod58(unsigned char *in, int inLen, int i){
+unsigned char 
+divmod58(unsigned char *in, int inLen, int i)
+{
 	int rem = 0;
-	for(;i<inLen; i++){
+	for(;i<inLen; i++) {
 		rem = rem * 256 + in[i];
 		in[i] = rem / 58;
 		rem = rem % 58;
@@ -250,9 +248,11 @@ unsigned char divmod58(unsigned char *in, int inLen, int i){
 	return rem & 0xFF;
 }
 
-unsigned char divmod256(unsigned char *in, int inLen, int i){
+unsigned char 
+divmod256(unsigned char *in, int inLen, int i)
+{
 	int rem = 0;
-	for(;i<inLen; i++){
+	for(;i<inLen; i++) {
 		rem = rem * 58 + in[i];
 		in[i] = rem / 256;
 		rem = rem % 256;
@@ -260,7 +260,9 @@ unsigned char divmod256(unsigned char *in, int inLen, int i){
 	return rem & 0xFF;
 }
 
-unsigned char *b58_encode(unsigned char *in, int inLen, int *outLen){
+unsigned char *
+b58_encode(unsigned char *in, int inLen, int *outLen)
+{
 	if(inLen == 0)
 		return NULL;
 
@@ -306,7 +308,9 @@ unsigned char *b58_encode(unsigned char *in, int inLen, int *outLen){
 	return out;
 }
 
-unsigned char *b58_decode(unsigned char *input, int inLen){
+unsigned char *
+b58_decode(unsigned char *input, int inLen, int *outLen)
+{
 	if(inLen == 0)
 		return NULL;
 
@@ -339,6 +343,7 @@ unsigned char *b58_decode(unsigned char *input, int inLen){
 
 	while(j<inLen && temp[j] == 0)		j++;
 
+	*outLen = inLen - j + z;
 	int len = inLen - j + z;
 	unsigned char *out = malloc(len + 1);
 	out[len] = 0;

@@ -3,10 +3,8 @@ Uses: pam_sm_authenticate()
 Only console/telnet login supported using a manual BitID login.
 
 Fixme:
-0. Generate challenge messsage for each login attempt.
-1. wrong bitcoin address at login will show last username in access file
-2. checksum address as part of verification.
-3. Package upkeep
+1. Generate challenge messsage for each login attempt.
+2. Package upkeep
    - pull commit messages into changelog on 'make dist'
    - fixup debian packaging, add make command
    - fixup return codes in main function.

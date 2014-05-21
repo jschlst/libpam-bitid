@@ -73,7 +73,7 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
 
   	switch (type) {
     	case BTC_ADDR:
-      		message.msg = "bitcoin: ";
+      		message.msg = "bitcoin address: ";
       		break;
 
     	case BTC_MSG2SIGN:
@@ -135,26 +135,7 @@ base58_check(char *data, int len)
 	return 0;
 }
 
-/* simple checks to validate address. */
-static int
-validate_address(char *addr)
-{
-	int len;
-
-	/* bitcoin first btye is either 1 or 3. */
-	if (addr[0] != '1' && addr[0] != '3')
-		return -1;
-
-	len = strlen(addr);
-	if (len < 27 || len > 34)
-		return -2;
-
-	if (base58_check(addr, len) < 0)
-		return -3;
-
-	return 0;
-}
-
+/* returns: malloc string, caller must free. */
 static char *
 remove_whitespace(char *str)
 {
@@ -178,7 +159,7 @@ remove_whitespace(char *str)
 
 /* returns: malloc string, caller must free. */
 static char * 
-verify_address(pam_handle_t *pamh, const char *file, char *addr)
+verify_access(pam_handle_t *pamh, const char *file, char *addr)
 {
 	char *address, *username = NULL;
 	char data[1000];
@@ -212,6 +193,8 @@ verify_address(pam_handle_t *pamh, const char *file, char *addr)
 			free(address);
 			break;
 		}
+		free(username);
+		username = NULL;
 	}
   	fclose(fd);
 	return username;
@@ -545,6 +528,51 @@ err:
 	return retval;
 }
 
+/* verify_address: check address length, base58check, and checksum.
+ * returns 1 upon success, 0 bad checksum, <0 error 
+ */
+static int
+verify_address(char *addr_s)
+{
+        unsigned char *bin_addr, checksum[SHA256_DIGEST_LENGTH];
+        int addr_len, bin_addr_len;
+	int retval;
+
+	/* check length and base58 encoding. */
+	if (!addr_s)
+		return -1;
+        addr_len = strlen(addr_s);
+        if (addr_len < 27 || addr_len > 34)
+                return -2;
+        if (base58_check(addr_s, addr_len) < 0)
+                return -3;
+
+	/* decode from base58 to 25 byte binary array. */
+        bin_addr = b58_decode((unsigned char *)addr_s, addr_len, &bin_addr_len);
+        if (!bin_addr)
+                return -4;
+        if (bin_addr_len != BTC_BIN_ADDR_SIZE) {
+		retval = -5;
+		goto err;
+        }
+
+	/* check version byte. */
+	if ((bin_addr[0] != 0) && (bin_addr[0] != 111)) {
+		retval = -6;
+		goto err;
+	}
+
+	/* compute address checksum and compare. */
+        dbl_hash256(bin_addr, 21, checksum);
+        if (!memcmp(&bin_addr[bin_addr_len-4], checksum, 4))
+                retval = 1;
+        else
+		retval = 0;
+
+err:	free(bin_addr);
+        return retval;
+}
+
 static int
 pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
@@ -573,15 +601,15 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	}
 
   	/* validate address format provided from the user. */
-	retval = validate_address(addr);
-	if (retval < 0) {
-		pam_syslog(pamh, LOG_ERR, "malformed bitcoin address used for login: %d", retval);
+	retval = verify_address(addr);
+	if (retval <= 0) {
+		pam_syslog(pamh, LOG_ERR, "malformed bitcoin address used for login: error %d", retval);
 		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
 		goto end;
 	}
 
 	/* lookup address to see if user can login using bitcoin. */
-	username = verify_address(pamh, file, addr);
+	username = verify_access(pamh, file, addr);
 	if (username == NULL) {
 		pam_syslog(pamh, LOG_ERR, "bitcoin address is not authorized for access: %s", addr);
 		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
