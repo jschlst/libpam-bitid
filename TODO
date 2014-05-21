@@ -1,23 +1,26 @@
 Uses: pam_sm_authenticate()
 
-Only console/telnet login support with manual BitID login.
-- will add other pam users, ssh, ruser, etc.
-
-How to setup so libpam-bitid just replaces "password:" prompt of login.
+Only console/telnet login supported using a manual BitID login.
 
 Fixme:
-1. Add bitcoin key signing code
-4. Cleanup code and all.
+1. wrong bitcoin address at login will show last username in access file
+2. checksum address as part of verification.
+2. Generate challenge messsage for each login attempt.
+3. Package upkeep
    - pull commit messages into changelog on 'make dist'
    - fixup debian packaging, add make command
    - fixup return codes in main function.
 
-5. Announce on bitcointalk bitid thread and pam mailing list
+2. Announce on bitcointalk bitid thread and pam mailing list
 
 Later:
 - Add QR code generation
-- enable a callback to have live 2fa using mobile device
+- enable a callback to allow using mobile device for signing
 - various example pam.d config files
+- option to use pam-bitid module for 'password' replacement of
+  password prompt of normal login.
+- option to check login against min bitcoin balance.
+- test other pam apps, ssh, ruser, etc
 
 Testing:
 - setup login file so it falls back to default login.
