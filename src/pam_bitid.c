@@ -439,7 +439,7 @@ pubkey2address(EC_KEY *pubkey, int *addr_len, int compressed)
         memcpy(&bin_addr[1], ripemd_b, sizeof(ripemd_b));
 	retval = dbl_hash256(bin_addr, 21, checksum);
 	memcpy(&bin_addr[21], &checksum[0], 4);
-	address = NBase58Encode(bin_addr, sizeof(bin_addr), addr_len);
+	address = b58_encode(bin_addr, sizeof(bin_addr), addr_len);
 	free(addr);
 	return address;
 }

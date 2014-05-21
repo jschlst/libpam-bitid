@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <string.h>
+#include <openssl/bn.h>
+
 #include "baseX.h"
 
 uint8_t charTable[64] = 
@@ -15,8 +19,7 @@ size_t b64_decodedLength(size_t length)
 
 void b64_encode(uint8_t *src, size_t len, uint8_t *dst)
 {
-	while(len >= 3)
-	{
+	while(len >= 3) {
 		// 1st b64 char
 		*dst = charTable[(src[0] & 0xfc) >> 2]; 
 		dst++;
@@ -41,8 +44,7 @@ void b64_encode(uint8_t *src, size_t len, uint8_t *dst)
 		len -= 3;
 	}
 
-	if(len == 2)
-	{
+	if(len == 2) {
 		// 1st b64 char
 		*dst = charTable[(src[0] & 0xfc) >> 2]; 
 		dst++;
@@ -55,9 +57,7 @@ void b64_encode(uint8_t *src, size_t len, uint8_t *dst)
 
 		// padding
 		*dst = '=';
-	}
-	else if(len == 1)
-	{
+	} else if(len == 1) {
 		// 1st b64 char
 		*dst = charTable[(src[0] & 0xfc) >> 2];
 		dst++;
@@ -223,14 +223,10 @@ size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 	return dstLength;
 }
 
-#include <stdio.h>
-#include <string.h>
-#include <openssl/bn.h>
 
 /*
-Based on: http://code.google.com/p/bitcoinj/source/browse/core/src/main/java/com/google/bitcoin/core/Base58.java
-*/
-
+ * base58
+ */
 
 static const char *ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 static unsigned char INDEXES[128] = { -1 };
@@ -264,7 +260,7 @@ unsigned char divmod256(unsigned char *in, int inLen, int i){
 	return rem & 0xFF;
 }
 
-unsigned char * NBase58Encode(unsigned char *in, int inLen, int *outLen){
+unsigned char *b58_encode(unsigned char *in, int inLen, int *outLen){
 	if(inLen == 0)
 		return NULL;
 
@@ -310,7 +306,7 @@ unsigned char * NBase58Encode(unsigned char *in, int inLen, int *outLen){
 	return out;
 }
 
-unsigned char * NBase58Decode(unsigned char *input, int inLen){
+unsigned char *b58_decode(unsigned char *input, int inLen){
 	if(inLen == 0)
 		return NULL;
 

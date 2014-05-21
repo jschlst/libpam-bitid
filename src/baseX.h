@@ -30,6 +30,6 @@ void b64_encode(uint8_t *src, size_t len, uint8_t *dst);
  */
 size_t b64_decode(uint8_t *src, size_t len, uint8_t *dst);
 
-unsigned char * NBase58Encode(unsigned char *in, int inLen, int *outLen);
-unsigned char * NBase58Decode(unsigned char *in, int inLen);
+unsigned char * b58_encode(unsigned char *in, int inLen, int *outLen);
+unsigned char * b58_decode(unsigned char *in, int inLen);
 #endif /* BASEX_H_ */

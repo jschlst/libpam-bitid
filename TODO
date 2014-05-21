@@ -3,15 +3,15 @@ Uses: pam_sm_authenticate()
 Only console/telnet login supported using a manual BitID login.
 
 Fixme:
+0. Generate challenge messsage for each login attempt.
 1. wrong bitcoin address at login will show last username in access file
 2. checksum address as part of verification.
-2. Generate challenge messsage for each login attempt.
 3. Package upkeep
    - pull commit messages into changelog on 'make dist'
    - fixup debian packaging, add make command
    - fixup return codes in main function.
 
-2. Announce on bitcointalk bitid thread and pam mailing list
+5. Announce on bitcointalk bitid thread and pam mailing list
 
 Later:
 - Add QR code generation
@@ -23,5 +23,6 @@ Later:
 - test other pam apps, ssh, ruser, etc
 
 Testing:
+- using various input string sizes, past max input.
 - setup login file so it falls back to default login.
 (test by having bitcoin.access missing)
