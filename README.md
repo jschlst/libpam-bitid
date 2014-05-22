@@ -16,8 +16,17 @@ Note: this is a work in progress leading up to release 1.0.0
 
 1. Follow Build steps in section above for this package.
 2. Edit /etc/pam.d/login and add the lines from examples/login.diff
-3. cp examples/bitcoin.access /etc/bitcoin.access
-4. Edit /etc/bitcoin.access and include list of allowed address/username pairs
+3. cp examples/bitid.access /etc/bitid.access
+4. Edit /etc/bitid.access and include list of allowed address/username pairs
+
+```
+# bitid.access:
+# List of users allowed access using login by bitcoin address
+#
+# format:
+# bitcoin-address, username
+# 1LdT92GDvP96cuiDRnQPhG4yCigQfxzWpz, btctest
+```
 
 ## Example
 ```
