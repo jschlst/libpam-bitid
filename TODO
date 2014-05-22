@@ -4,15 +4,17 @@ Only console/telnet login supported using a manual BitID login.
 
 Fixme:
 1. testing
-2. 
+2. Various example pam.d config files 
 3. Announce on bitcointalk bitid thread and pam mailing list
 
 - allow retry on data entry error, re-prompt user for input.
+- option to use pam-bitid module for 'password' replacement of
+  password prompt of normal login.
+- setup login file so it falls back to default login.
 
 Later:
 - Add QR code generation
 - enable a callback to allow using mobile device for signing
-- various example pam.d config files
 - option to use pam-bitid module for 'password' replacement of
   password prompt of normal login.
 - option to check login against min bitcoin balance.
@@ -20,5 +22,4 @@ Later:
 
 Testing:
 - using various input string sizes, past max input.
-- setup login file so it falls back to default login.
-(test by having bitcoin.access missing)
+- test by having bitid.access file missing

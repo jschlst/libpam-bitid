@@ -5,32 +5,33 @@ A PAM module to use a bitcoin address for credentials
 
 This module is an implementation of the BitID protocol. 
 
+Currently only console and telnet login are supported.
+
 Written by: Jay Schulist <jayschulist@gmail.com>
 
 ## Download
-Releases are archived in git the repository: 
+Releases are archived in the git repository: 
 https://github.com/angrycod/libpam-bitid/tree/master/releases
 
 Ubuntu/debian packages are here:
 https://github.com/angrycod/libpam-bitid/tree/master/releases/debian
 
 ## Build
-
-1. ./autogen.sh
-2. ./configure --prefix=/usr
-3. make
+1. `git clone https://github.com/angrycod/libpam-bitid.git`
+2. `cd libpam_bitid`
+3. `./autogen.sh`
+4. `./configure --prefix=/usr`
+5. `make`
 
 ## Install
-
 1. `sudo make install`
 2. Edit /etc/pam.d/login and add the lines from examples/login.diff
-3. cp examples/bitid.access /etc/bitid.access
+3. `cp examples/bitid.access /etc/bitid.access`
 
-### Ubuntu/debian install
+#### Ubuntu/debian install
 1. `sudo dpkg -i libpam-bitid_0.1.0_amd64.deb`
 
 ## Configuration
-
 Edit /etc/bitid.access and include list of allowed address/username pairs
 
 ```
