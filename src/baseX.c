@@ -4,6 +4,10 @@
 
 #include "baseX.h"
 
+/*
+ * base64
+ */
+
 uint8_t charTable[64] = 
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -290,7 +294,8 @@ b58_encode(unsigned char *in, int inLen, int *outLen)
 
 	free(inCopy);
 
-	while(j<inLen_x2 && temp[j] == '1')		j++;
+	while(j<inLen_x2 && temp[j] == '1')		
+		j++;
 
 	while(--z >= 0)
 		temp[--j] = '1';
@@ -341,7 +346,8 @@ b58_decode(unsigned char *input, int inLen, int *outLen)
 
 	free(input58);
 
-	while(j<inLen && temp[j] == 0)		j++;
+	while(j<inLen && temp[j] == 0)		
+		j++;
 
 	*outLen = inLen - j + z;
 	int len = inLen - j + z;

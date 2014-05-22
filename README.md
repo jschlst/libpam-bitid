@@ -26,10 +26,10 @@ Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
 Ubuntu 13.10
-bitcoin: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G
-challenge message: test 
-signature: Gw4YdpEAyDqTtLVYn6/0aH6Qg9fHjpX1+MTxJKMZgppSOI9e0/5rY6T23NpW7QB52tIz3EkjTkVmn7Pe3BZn3Aw=
-Last login: Wed May 21 00:01:16 PDT 2014 from localhost on pts/8
+bitcoin address: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G
+challenge message: dbcbd542b29a3c4298651035ae6eaed3
+signature: HE8DDp4eAEy61417XTPAQTOqPBcLP2h0Y0sTB9hfFILCv8ZpLzdH6dh/z6+o7A4VwwjM1Qq2SFVcgyf7U51JhdE=
+Last login: Wed May 21 18:42:01 PDT 2014 from localhost on pts/17
 Welcome to Ubuntu 13.10 (GNU/Linux 3.11.0-12-generic x86_64)
  
 btctest:~$

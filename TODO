@@ -3,13 +3,13 @@ Uses: pam_sm_authenticate()
 Only console/telnet login supported using a manual BitID login.
 
 Fixme:
-1. Generate challenge messsage for each login attempt.
+0. add info for baseX code source. 
 2. Package upkeep
    - pull commit messages into changelog on 'make dist'
    - fixup debian packaging, add make command
-   - fixup return codes in main function.
-
 5. Announce on bitcointalk bitid thread and pam mailing list
+
+- allow retry on data entry error, re-prompt user for input.
 
 Later:
 - Add QR code generation

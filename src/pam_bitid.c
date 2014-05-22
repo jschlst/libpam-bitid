@@ -47,7 +47,6 @@
 #include <openssl/bn.h>
 #include <openssl/sha.h>
 
-
 #include "baseX.h"
 
 #define PUBLIC_KEY_SIZE	65
@@ -55,7 +54,6 @@
 
 enum prompts {
 	BTC_ADDR,
-	BTC_MSG2SIGN,
 	BTC_SIG
 };
 
@@ -74,10 +72,6 @@ get_bitcoin_info(pam_handle_t * pamh, int type)
   	switch (type) {
     	case BTC_ADDR:
       		message.msg = "bitcoin address: ";
-      		break;
-
-    	case BTC_MSG2SIGN:
-      		message.msg = "challenge message: ";
       		break;
 
     	case BTC_SIG:
@@ -573,10 +567,92 @@ err:	free(bin_addr);
         return retval;
 }
 
+#if 0
+    entropy = str(os.urandom(32)) + str(random.randrange(2**256)) + str(int(time.time())**7)
+#endif
+
+/* generate a random nonce, default nonce_len = 16. */
+static unsigned char *
+generate_nonce(pam_handle_t *pamh, int nonce_len)
+{
+	unsigned char *key, hash[SHA256_DIGEST_LENGTH];
+	unsigned char *data_out;
+	int randfd;
+	int i, count, key_size = 32;
+
+	/* open the random device to get key data. */
+        randfd = open("/dev/urandom", O_RDONLY);
+        if (randfd == -1) {
+                pam_syslog(pamh, LOG_ERR, "Cannot open /dev/urandom: %m");
+           	return NULL;
+	}
+
+	/* Read random data for use as the key. */
+        key = malloc(key_size);
+        if (!key) {
+                close(randfd);
+                return NULL;
+        }
+	count = 0;
+        while (count < key_size) {
+                i = read(randfd, key + count, key_size - count);
+                if ((i == 0) || (i == -1)) {
+                        break;
+                }
+                count += i;
+        }
+        close(randfd); 
+
+	// FIXME: add random() + timestamp
+
+	hash256(key, key_size, hash);
+	free(key);
+	data_out = malloc(nonce_len);
+	if (!data_out)
+		return NULL;
+	memcpy(data_out, hash, nonce_len);
+	return data_out;
+}
+
+/* FIXME: option for bitid uri challenge generation.
+ * bitid://hostname/callback?x=Nonce&u=1 
+ */
+static char * 
+challenge(pam_handle_t *pamh, int *out_len)
+{
+	unsigned char *nonce;
+	char *msg;
+	int i, len, msg_len;
+
+	nonce = generate_nonce(pamh, 16);
+	if (!nonce) {
+		*out_len = -1;
+		return NULL;
+	}
+
+	msg_len = (16 + 1) * 2;
+	msg = malloc(msg_len);
+	if (!msg) {
+		*out_len = -2;
+		free(nonce);
+		return NULL;
+	}
+	memset(msg, '\0', msg_len);
+
+	len = 0;
+	for(i = 0; i < 16; i++)
+		len += sprintf(msg + len, "%02x", nonce[i]);
+	free(nonce);
+
+	printf("challenge message: %s\n", msg);
+	*out_len = strlen(msg);
+	return msg;
+}
+
 static int
 pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
-	char *username = NULL, *message = NULL, *addr = NULL, *sig = NULL;
+	char *username = NULL, *addr = NULL, *message = NULL, *sig = NULL;
 	const char *file = NULL;
   	int retval;
 
@@ -610,22 +686,15 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 
 	/* lookup address to see if user can login using bitcoin. */
 	username = verify_access(pamh, file, addr);
-	if (username == NULL) {
+	if (!username) {
 		pam_syslog(pamh, LOG_ERR, "bitcoin address is not authorized for access: %s", addr);
 		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
 		goto end;
 	}
 
-	/* FIXME: do bitid challenge generation.
-	 *
-   	 * bitid://hostname/callback?x=Nonce&u=1 
-   	 *
-   	 * show QR code to sign with mobile device
-	 * option to open socket and listen for callback.
-   	 */
-
-  	/* generate and get message to sign. */
-  	if ((message = get_bitcoin_info(pamh, BTC_MSG2SIGN)) == NULL) {
+  	/* generate challenge message to sign. */
+	message = challenge(pamh, &retval);
+	if (!message || (retval < 0)) {
     		retval = PAM_AUTH_ERR;
 		goto end;
   	}
