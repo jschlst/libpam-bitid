@@ -8,16 +8,16 @@ This module is an implementation of the BitID protocol.
 Currently only console and telnet login are supported.
 
 ## Download
-Releases are archived in the git repository: 
-https://github.com/angrycod/libpam-bitid/tree/master/releases
+Releases are archived in the git repository:
+[releases/ directory](releases)
 
 Ubuntu/debian packages are here:
-https://github.com/angrycod/libpam-bitid/tree/master/releases/debian
+[debian/ directory](releases/debian)
 
 Note: select the file and then select "RAW" button to start download. 
 
 Current release:
-* [libpam-bitid_0.1.0_amd64.deb](releases/debian/libpam-bitid_0.1.0_amd64.deb)
+* [libpam-bitid_0.1.0_amd64.deb](https://github.com/angrycod/libpam-bitid/raw/master/releases/debian/libpam-bitid_0.1.0_amd64.deb)
 * [libpam-bitid-0.1.0.tar.bz2](https://github.com/angrycod/libpam-bitid/raw/master/releases/libpam-bitid-0.1.0.tar.bz2)
 
 ## Build
@@ -64,9 +64,9 @@ btctest:~$
 ```
 
 ## References
-* BitID protocol specification (https://github.com/bitid/bitid)
-* Linux-PAM (http://www.linux-pam.org)
-* Bitcoin protocol specification (https://en.bitcoin.it/wiki/Protocol_specification)
+* [BitID protocol specification] (https://github.com/bitid/bitid)
+* [Linux-PAM] (http://www.linux-pam.org)
+* [Bitcoin protocol specification] (https://en.bitcoin.it/wiki/Protocol_specification)
 
 ## Credits
 Jay Schulist <jayschulist@gmail.com>
