@@ -1,13 +1,11 @@
 libpam-bitid
 ============
 
-A PAM module to use a bitcoin address for credentials
+A PAM module to use a bitcoin address for credentials.
 
-This module is an implementation of the BitID protocol. 
+This module is an implementation of the BitID protocol.
 
 Currently only console and telnet login are supported.
-
-Written by: Jay Schulist <jayschulist@gmail.com>
 
 ## Download
 Releases are archived in the git repository: 
@@ -15,6 +13,12 @@ https://github.com/angrycod/libpam-bitid/tree/master/releases
 
 Ubuntu/debian packages are here:
 https://github.com/angrycod/libpam-bitid/tree/master/releases/debian
+
+Note: select the file and then select "RAW" button to start download. 
+
+Current release:
+* [libpam-bitid_0.1.0_amd64.deb](releases/debian/libpam-bitid_0.1.0_amd64.deb)
+* [libpam-bitid-0.1.0.tar.bz2](https://github.com/angrycod/libpam-bitid/raw/master/releases/libpam-bitid-0.1.0.tar.bz2)
 
 ## Build
 1. `git clone https://github.com/angrycod/libpam-bitid.git`
@@ -59,7 +63,10 @@ Welcome to Ubuntu 13.10 (GNU/Linux 3.11.0-12-generic x86_64)
 btctest:~$
 ```
 
-## Documentation
+## References
 * BitID protocol specification (https://github.com/bitid/bitid)
 * Linux-PAM (http://www.linux-pam.org)
 * Bitcoin protocol specification (https://en.bitcoin.it/wiki/Protocol_specification)
+
+## Credits
+Jay Schulist <jayschulist@gmail.com>
