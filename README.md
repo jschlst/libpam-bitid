@@ -9,10 +9,9 @@ Currently only console and telnet login are supported.
 
 ## Download
 Releases are archived in the git repository:
-[releases/ directory](releases)
 
-Ubuntu/debian packages are here:
-[debian/ directory](releases/debian)
+[Source tar-balls](releases)
+[Ubuntu/debian packages](releases/debian)
 
 Note: select the file and then select "RAW" button to start download. 
 
@@ -29,8 +28,8 @@ Current release:
 
 ## Install
 1. `sudo make install`
-2. Edit /etc/pam.d/login and add the lines from examples/login.diff
-3. `cp examples/bitid.access /etc/bitid.access`
+2. `cp examples/bitid.access /etc/bitid.access`
+3. Edit /etc/pam.d/login and add the lines from examples/login.diff
 
 #### Ubuntu/debian install
 1. `sudo dpkg -i libpam-bitid_0.1.0_amd64.deb`
