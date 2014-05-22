@@ -672,7 +672,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	/* get bitcoin address. */
   	addr = get_bitcoin_info(pamh, BTC_ADDR);
 	if (addr == NULL) {
-    		retval = PAM_AUTH_ERR;
+    		retval = PAM_USER_UNKNOWN;
 		goto end;
   	}
 
@@ -680,7 +680,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	retval = verify_address(addr);
 	if (retval <= 0) {
 		pam_syslog(pamh, LOG_ERR, "malformed bitcoin address used for login: error %d", retval);
-		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
+		retval = PAM_USER_UNKNOWN;
 		goto end;
 	}
 
@@ -695,13 +695,13 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	/* generate challenge message to sign. */
 	message = challenge(pamh, &retval);
 	if (!message || (retval < 0)) {
-    		retval = PAM_AUTH_ERR;
+    		retval = PAM_USER_UNKNOWN;
 		goto end;
   	}
 
   	/* get signature of message. */
   	if ((sig = get_bitcoin_info(pamh, BTC_SIG)) == NULL) {
-    		retval = PAM_AUTH_ERR;
+    		retval = PAM_USER_UNKNOWN;
 		goto end;
 	}
 
@@ -709,7 +709,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	retval = verify_signature(pamh, addr, message, sig);
 	if (retval <= 0) {
 		pam_syslog(pamh, LOG_ERR, "user: %s failed login signature verification from: %s\n", username, addr);
-		retval = PAM_AUTH_ERR;
+		retval = PAM_USER_UNKNOWN;
 		goto end;
 	}
 

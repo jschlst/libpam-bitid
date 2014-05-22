@@ -41,7 +41,7 @@ Edit /etc/bitid.access and include list of allowed address/username pairs
 #
 # format:
 # bitcoin-address, username
-# 1LdT92GDvP96cuiDRnQPhG4yCigQfxzWpz, btctest
+# 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G, btctest
 ```
 
 ## Example

@@ -7,18 +7,24 @@ Fixme:
 2. Various example pam.d config files 
 3. Announce on bitcointalk bitid thread and pam mailing list
 
-- allow retry on data entry error, re-prompt user for input.
+Config file stuff:
+- provide longer time to enter input
+- allow retry on data entry error, re-prompt user for input on signature?
+
 - option to use pam-bitid module for 'password' replacement of
   password prompt of normal login.
 - setup login file so it falls back to default login.
+- other pam apps, ssh, ruser, etc
+
+* Set USER_PROMPT variable.
+* some pam variable isn't being set right.
+- when enabled pam modules: pam_securetty.so pam_nologin.so cause 
+  username login prompt instead of bitcoin after failed input attempt.
 
 Later:
 - Add QR code generation
 - enable a callback to allow using mobile device for signing
-- option to use pam-bitid module for 'password' replacement of
-  password prompt of normal login.
 - option to check login against min bitcoin balance.
-- test other pam apps, ssh, ruser, etc
 
 Testing:
 - using various input string sizes, past max input.
