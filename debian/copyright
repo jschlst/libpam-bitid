@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libpam-bitid
-Source: https://github.com/jollycoder/libpam-bitid.git
+Source: https://github.com/angrycod/libpam-bitid.git
 
 Files: *
 Copyright: 2014, Jay Schulist

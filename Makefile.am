@@ -6,3 +6,7 @@ SUBDIRS = src tests
 CLEANFILES = 
 
 EXTRA_DIST = examples releases
+
+builddeb:
+	dch -e
+	dpkg-buildpackage -us -uc

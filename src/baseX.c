@@ -5,7 +5,20 @@
 #include "baseX.h"
 
 /*
- * base64
+ * base64 code is modified from original source code from: 
+ * https://github.com/tomcumming/base64.git
+ *
+ * Copyright (c) 2014 Tom Cumming
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * ( of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  */
 
 uint8_t charTable[64] = 
@@ -224,14 +237,26 @@ b64_decode(uint8_t *src, size_t len, uint8_t *dst)
 
 
 /*
- * base58
+ * base58 code is modified from original source code from: 
+ * https://github.com/netrikare/NBase58.git
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * ( of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  */
 
 static const char *ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 static unsigned char INDEXES[128] = { -1 };
 
 unsigned char *
-getIndexes(){
+getIndexes(void)
+{
 	int i;
 
 	for (i = 0; i < 58; i++)

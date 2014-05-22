@@ -1,5 +1,6 @@
+# bitid.access:
 # List of users allowed access using login by bitcoin address
 #
 # format:
 # bitcoin-address, username
-1LdT92GDvP96cuiDRnQPhG4yCigQfxzWpz, btctest
+# 1LdT92GDvP96cuiDRnQPhG4yCigQfxzWpz, btctest

@@ -7,8 +7,8 @@ Build-Depends: debhelper (>= 9),
                libpam0g-dev,
                pkg-config,
 Standards-Version: 3.9.4
-Homepage: https://github.com/jollycoder/libpam-bitid.git
-Vcs-Git: https://github.com/jollycoder/libpam-bitid.git
+Homepage: https://github.com/angrycod/libpam-bitid.git
+Vcs-Git: https://github.com/angrycod/libpam-bitid.git
 
 Package: libpam-bitid
 Architecture: any

@@ -5,7 +5,7 @@
  #
  
 +# Allow bitcoin address as a login authentication method.
-+auth       optional pam_bitid.so file=/etc/bitcoin.access
++auth       optional pam_bitid.so file=/etc/bitid.access
 +
  # Enforce a minimal delay in case of failure (in microseconds).
  # (Replaces the `FAIL_DELAY' setting from login.defs)

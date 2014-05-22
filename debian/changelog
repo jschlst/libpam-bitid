@@ -1,5 +1,5 @@
-libpam-bitid (0.0.1); urgency=low
+libpam-bitid (0.1.0) UNRELEASED; urgency=low
 
-  * New upstream release.
+  * Initial release. 
 
- -- Jay Schulist <jayschulist@gmail.com>  Fri May  9 23:07:08 PDT 2014
+ -- Jay Schulist <jayschulist@agentorange>  Wed, 21 May 2014 22:44:37 -0700
