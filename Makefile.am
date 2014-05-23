@@ -5,7 +5,7 @@ SUBDIRS = src tests
 
 CLEANFILES = 
 
-EXTRA_DIST = examples releases
+EXTRA_DIST = examples releases autogen.sh README.md TODO.md
 
 builddeb:
 	dch -e
