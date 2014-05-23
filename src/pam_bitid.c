@@ -29,6 +29,7 @@
 #include <syslog.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #define PAM_SM_ACCOUNT
 #define PAM_SM_AUTH
@@ -567,35 +568,38 @@ err:	free(bin_addr);
         return retval;
 }
 
-#if 0
-    entropy = str(os.urandom(32)) + str(random.randrange(2**256)) + str(int(time.time())**7)
-#endif
-
 /* generate a random nonce, default nonce_len = 16. */
 static unsigned char *
 generate_nonce(pam_handle_t *pamh, int nonce_len)
 {
-	unsigned char *key, hash[SHA256_DIGEST_LENGTH];
+	unsigned char *key, *urand, hash[SHA256_DIGEST_LENGTH];
 	unsigned char *data_out;
+	int i, count, urand_size = 32;
 	int randfd;
-	int i, count, key_size = 32;
+	long int r;
+	time_t t;
 
-	/* open the random device to get key data. */
+	count = urand_size + sizeof(time_t) + sizeof(long int);
+	key = malloc(count);
+	if (!key)
+		return NULL;
+
+	/* read random data for use as the key. */
         randfd = open("/dev/urandom", O_RDONLY);
         if (randfd == -1) {
                 pam_syslog(pamh, LOG_ERR, "Cannot open /dev/urandom: %m");
+		free(key);
            	return NULL;
 	}
-
-	/* Read random data for use as the key. */
-        key = malloc(key_size);
-        if (!key) {
+        urand = malloc(urand_size);
+        if (!urand) {
                 close(randfd);
+		free(key);
                 return NULL;
         }
 	count = 0;
-        while (count < key_size) {
-                i = read(randfd, key + count, key_size - count);
+        while (count < urand_size) {
+                i = read(randfd, urand + count, urand_size - count);
                 if ((i == 0) || (i == -1)) {
                         break;
                 }
@@ -603,10 +607,22 @@ generate_nonce(pam_handle_t *pamh, int nonce_len)
         }
         close(randfd); 
 
-	// FIXME: add random() + timestamp
+	/* increase entropy with random() and current time(). */
+	r = random();
+	t = time(NULL);
 
-	hash256(key, key_size, hash);
+	/* build key for nonce hash */
+	count = 0;
+	memcpy(key + count, urand, urand_size);
+	count += urand_size;
+	memcpy(key + count, &r, sizeof(r));
+	count += sizeof(r);
+	memcpy(key + count, &t, sizeof(t));
+        count += sizeof(t);
+	hash256(key, count, hash);
+	free(urand);
 	free(key);
+
 	data_out = malloc(nonce_len);
 	if (!data_out)
 		return NULL;
