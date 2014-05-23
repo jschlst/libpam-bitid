@@ -695,13 +695,13 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	/* generate challenge message to sign. */
 	message = challenge(pamh, &retval);
 	if (!message || (retval < 0)) {
-    		retval = PAM_USER_UNKNOWN;
+    		retval = PAM_SERVICE_ERR;
 		goto end;
   	}
 
   	/* get signature of message. */
   	if ((sig = get_bitcoin_info(pamh, BTC_SIG)) == NULL) {
-    		retval = PAM_USER_UNKNOWN;
+    		retval = PAM_AUTH_ERR;
 		goto end;
 	}
 
@@ -709,7 +709,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	retval = verify_signature(pamh, addr, message, sig);
 	if (retval <= 0) {
 		pam_syslog(pamh, LOG_ERR, "user: %s failed login signature verification from: %s\n", username, addr);
-		retval = PAM_USER_UNKNOWN;
+		retval = PAM_AUTH_ERR;
 		goto end;
 	}
 
@@ -717,6 +717,9 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
         retval = pam_set_item(pamh, PAM_USER, username);
         if (retval != PAM_SUCCESS)
                 goto end;
+	retval = pam_set_item(pamh, PAM_AUTHTOK, sig);
+	if (retval != PAM_SUCCESS)
+		goto end;
 	pam_syslog(pamh, LOG_INFO, "user: %s allowed access from: %s\n", username, addr);
 
 end:
