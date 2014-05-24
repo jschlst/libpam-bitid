@@ -58,56 +58,44 @@ enum prompts {
 	BTC_SIG
 };
 
+/* returns: NULL on error or on success 'msg' containing response to prompt.
+ * Must free returned string.
+ */
 static char *
-get_bitcoin_info(pam_handle_t * pamh, int type)
+bitcoin_prompt(pam_handle_t * pamh, int type)
 {
-	struct pam_message message;
-	const struct pam_message * pmessage = &message;
-  	char *msg = NULL;
-  	int len;
+  	char *msg = NULL, *resp = NULL;
+  	int len, retval;
 
   	/* build up the message we're prompting for */
-  	message.msg = NULL;
-  	message.msg_style = PAM_PROMPT_ECHO_ON;
-
   	switch (type) {
     	case BTC_ADDR:
-      		message.msg = "bitcoin address: ";
+      		msg = "bitcoin address: ";
       		break;
 
     	case BTC_SIG:
-      		message.msg = "signature: ";
+      		msg = "signature: ";
       		break;
   	}
-
-  	struct pam_conv *conv = NULL;
-  	if (pam_get_item(pamh, PAM_CONV, (const void **)&conv) != PAM_SUCCESS || conv == NULL || conv->conv == NULL) {
-    		return NULL;
-  	}
-
-  	struct pam_response *responses = NULL;
-  	if (conv->conv(1, &pmessage, &responses, conv->appdata_ptr) != PAM_SUCCESS || responses == NULL) {
-    		return NULL;
-  	}
-
-  	char * promptval = responses->resp;
-  	free(responses);
-
-  	/* If we didn't get anything, just move on */
-  	if (promptval == NULL) {
-    		return NULL;
-  	}
+	// FIXME: try pam_get_user() and get_authtok()
+	// pam_set_item(pamh, PAM_USER_PROMPT, msg);
+	retval = pam_prompt(pamh, PAM_PROMPT_ECHO_ON, &resp, "%s", msg);
+	if ((retval != PAM_SUCCESS) || (resp == NULL)) {
+		return NULL;
+	}
 
 	/* Note: must free message when done. */
   	msg = malloc(PAM_MAX_MSG_SIZE);
+	if (!msg) {
+		free(resp);
+		return NULL;
+	}
   	memset(msg, '\0', PAM_MAX_MSG_SIZE);
-  	len = strlen(promptval);
+  	len = strlen(resp);
   	if (len > PAM_MAX_MSG_SIZE)
     		len = PAM_MAX_MSG_SIZE;
-  	memcpy(msg, promptval, len);
-
-  	// printf("%s\n", promptval);
-  	free(promptval);
+  	memcpy(msg, resp, len);
+	free(resp);
   	return msg;
 }
 
@@ -163,7 +151,7 @@ verify_access(pam_handle_t *pamh, const char *file, char *addr)
 
 	/* If no configuration then ignore, so defaults work. */
 	fd = fopen(file, "r");
-	if (fd < 0) {
+	if (!fd) {
 		pam_syslog(pamh, LOG_ERR, "Unable to open configuration file: %s", file);
 		return NULL;
   	}
@@ -660,7 +648,7 @@ challenge(pam_handle_t *pamh, int *out_len)
 		len += sprintf(msg + len, "%02x", nonce[i]);
 	free(nonce);
 
-	printf("challenge message: %s\n", msg);
+	pam_info(pamh, "challenge message: %s", msg);
 	*out_len = strlen(msg);
 	return msg;
 }
@@ -686,7 +674,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	}
 
   	/* get bitcoin address. */
-  	addr = get_bitcoin_info(pamh, BTC_ADDR);
+  	addr = bitcoin_prompt(pamh, BTC_ADDR);
 	if (addr == NULL) {
     		retval = PAM_USER_UNKNOWN;
 		goto end;
@@ -704,7 +692,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	username = verify_access(pamh, file, addr);
 	if (!username) {
 		pam_syslog(pamh, LOG_ERR, "bitcoin address is not authorized for access: %s", addr);
-		retval = PAM_USER_UNKNOWN; // PAM_AUTH_ERR;
+		retval = PAM_PERM_DENIED;
 		goto end;
 	}
 
@@ -716,7 +704,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
   	}
 
   	/* get signature of message. */
-  	if ((sig = get_bitcoin_info(pamh, BTC_SIG)) == NULL) {
+  	if ((sig = bitcoin_prompt(pamh, BTC_SIG)) == NULL) {
     		retval = PAM_AUTH_ERR;
 		goto end;
 	}
@@ -725,7 +713,7 @@ pam_bitcoin(pam_handle_t *pamh, int flags, int argc, const char **argv)
 	retval = verify_signature(pamh, addr, message, sig);
 	if (retval <= 0) {
 		pam_syslog(pamh, LOG_ERR, "user: %s failed login signature verification from: %s\n", username, addr);
-		retval = PAM_AUTH_ERR;
+		retval = PAM_AUTHTOK_RECOVERY_ERR;
 		goto end;
 	}
 
