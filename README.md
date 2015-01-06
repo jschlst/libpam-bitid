@@ -17,6 +17,10 @@ Releases are archived in the git repository:
 * [Ubuntu/debian packages](releases/debian)
 * Note: select the file and then select "RAW" button to start download.
 
+## Requires
+- autoconfig
+- libtool
+
 ## Build
 1. `git clone https://github.com/angrycod/libpam-bitid.git`
 2. `cd libpam_bitid`
@@ -44,7 +48,28 @@ Edit /etc/bitid.access and include list of allowed address/username pairs
 # 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G, btctest
 ```
 
-## Example
+Edit /etc/pam.d/login to allow bitid login using telnet:
+
+Add this line at the very top:
+`auth       optional pam_bitid.so file=/etc/bitid.access`
+
+And comment out this line:
+`# @include common-auth`
+
+If common-auth is still enabled then pam will try and do a unix login after doing the bitid login.
+
+## Logs
+Check /var/log/auth.log on Ubuntu for output of libpam-bitid module.
+
+Upon successful bitid authentication you will see messages from pam_bitid.
+`pam_bitid(login:auth): user: btctest allowed access from: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G`
+
+## Testing example configuration
+It's clunky, but for testing this select the address in electrum and sign the challenge
+message provided by the pam-bitid login with that. 
+
+To get a login prompt, `telnet 127.0.0.1` and then enter your bitcoin address.
+
 ```
 $ telnet localhost
 Trying 127.0.0.1...
@@ -59,6 +84,9 @@ Welcome to Ubuntu 13.10 (GNU/Linux 3.11.0-12-generic x86_64)
  
 btctest:~$
 ```
+
+## Notes:
+* Signatures are in electrum format, so signature will not be valid if using another format. Many clients use the electrum format, so other clients than electrum may work okay.
 
 ## References
 * [BitID protocol specification] (https://github.com/bitid/bitid)
