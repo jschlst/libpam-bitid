@@ -37,7 +37,7 @@ Releases are archived in the git repository:
 1. `sudo dpkg -i libpam-bitid_0.1.0_amd64.deb`
 
 ## Configuration
-'vi /etc/bitid.access' Edit to include your list of allowed address/username pairs
+`vi /etc/bitid.access` Edit to include your list of allowed address/username pairs
 
 ```
 # bitid.access:
@@ -48,7 +48,7 @@ Releases are archived in the git repository:
 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G, btctest
 ```
 
-'vi /etc/pam.d/login' Edit to allow bitid login using telnet:
+`vi /etc/pam.d/login` Edit to allow bitid login using telnet:
 
 Add this line at the very top:
 `auth       optional pam_bitid.so file=/etc/bitid.access`
@@ -56,7 +56,7 @@ Add this line at the very top:
 And comment out this line:
 `# @include common-auth`
 
-If common-auth is still enabled then pam will try and do a unix login after doing the bitid login.
+If `common-auth` is still enabled then pam will try and do a unix login after doing the bitid login.
 
 ## Logs
 Check `/var/log/auth.log` on Ubuntu for output of libpam-bitid module.
