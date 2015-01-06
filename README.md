@@ -30,14 +30,14 @@ Releases are archived in the git repository:
 
 ## Install
 1. `sudo make install`
-2. `cp examples/bitid.access /etc/bitid.access`
-3. Edit /etc/pam.d/login and add the lines from examples/login.diff
+2. `sudo cp examples/bitid.access /etc/bitid.access`
+3. `sudo vi /etc/pam.d/login` Edit to add the lines from examples/login.diff
 
 #### Ubuntu/debian install
 1. `sudo dpkg -i libpam-bitid_0.1.0_amd64.deb`
 
 ## Configuration
-Edit /etc/bitid.access and include list of allowed address/username pairs
+'vi /etc/bitid.access' Edit to include your list of allowed address/username pairs
 
 ```
 # bitid.access:
@@ -45,10 +45,10 @@ Edit /etc/bitid.access and include list of allowed address/username pairs
 #
 # format:
 # bitcoin-address, username
-# 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G, btctest
+1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G, btctest
 ```
 
-Edit /etc/pam.d/login to allow bitid login using telnet:
+'vi /etc/pam.d/login' Edit to allow bitid login using telnet:
 
 Add this line at the very top:
 `auth       optional pam_bitid.so file=/etc/bitid.access`
@@ -59,10 +59,12 @@ And comment out this line:
 If common-auth is still enabled then pam will try and do a unix login after doing the bitid login.
 
 ## Logs
-Check /var/log/auth.log on Ubuntu for output of libpam-bitid module.
+Check `/var/log/auth.log` on Ubuntu for output of libpam-bitid module.
 
 Upon successful bitid authentication you will see messages from pam_bitid.
-`pam_bitid(login:auth): user: btctest allowed access from: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G`
+```
+pam_bitid(login:auth): user: btctest allowed access from: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G
+```
 
 ## Testing example configuration
 It's clunky, but for testing this select the address in electrum and sign the challenge
@@ -75,7 +77,7 @@ $ telnet localhost
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
-Ubuntu 13.10
+Ubuntu 14.04.1 LTS
 bitcoin address: 1DvRd44mD8EuCcym8zymYzabvmozwZ5r8G
 challenge message: dbcbd542b29a3c4298651035ae6eaed3
 signature: HE8DDp4eAEy61417XTPAQTOqPBcLP2h0Y0sTB9hfFILCv8ZpLzdH6dh/z6+o7A4VwwjM1Qq2SFVcgyf7U51JhdE=
@@ -86,7 +88,7 @@ btctest:~$
 ```
 
 ## Notes:
-* Signatures are in electrum format, so signature will not be valid if using another format. Many clients use the electrum format, so other clients than electrum may work okay.
+* Signatures are in electrum format, so signature will not be valid if using another format. Many clients use the electrum format, so clients other than electrum may work okay.
 
 ## References
 * [BitID protocol specification] (https://github.com/bitid/bitid)
